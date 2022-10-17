@@ -1,23 +1,23 @@
+interface RGBValue {
+  r: number;
+  g: number;
+  b: number;
+}
+
 const buildRgb = (imageData: Uint8ClampedArray) => {
-  const rgbValues = [];
+  const rgbValues = [] as RGBValue[];
   for (let i = 0; i < imageData.length; i += 4) {
     const rgb = {
       r: imageData[i],
       g: imageData[i + 1],
-      b: imageData[i + 2]
-    };
+      b: imageData[i + 2],
+    } as RGBValue;
     rgbValues.push(rgb);
   }
   return rgbValues;
 };
 
-const findBiggestColorRange = (
-  rgbValues: Array<{
-    r: number;
-    g: number;
-    b: number;
-  }>
-) => {
+const findBiggestChannel = (rgbValues: RGBValue[]) => {
   let rMin = Number.MAX_VALUE;
   let gMin = Number.MAX_VALUE;
   let bMin = Number.MAX_VALUE;
@@ -46,9 +46,48 @@ const findBiggestColorRange = (
       return "r";
     case gRange:
       return "g";
-    case bRange:
+    default:
       return "b";
   }
+};
+
+const quantization = (rgbValues: RGBValue[], depth: number) => {
+  const MAX_DEPTH = 4;
+
+  if (depth === MAX_DEPTH || rgbValues.length === 0) {
+    const color = rgbValues.reduce(
+      (prev, curr) => {
+        prev.r += curr.r;
+        prev.g += curr.g;
+        prev.b += curr.b;
+
+        return prev;
+      },
+      {
+        r: 0,
+        g: 0,
+        b: 0,
+      }
+    );
+
+    color.r = Math.round(color.r / rgbValues.length);
+    color.g = Math.round(color.g / rgbValues.length);
+    color.b = Math.round(color.b / rgbValues.length);
+
+    return [color];
+  }
+
+  const channel = findBiggestChannel(rgbValues);
+  rgbValues.sort((a, b) => {
+    return a[channel] - b[channel];
+  });
+
+  const mid = rgbValues.length / 2;
+
+  return [
+    ...quantization(rgbValues.slice(0, mid), depth + 1),
+    ...quantization(rgbValues.slice(mid + 1), depth + 1),
+  ];
 };
 
 document.getElementById("btnLoad")?.addEventListener("click", () => {
@@ -67,9 +106,9 @@ document.getElementById("btnLoad")?.addEventListener("click", () => {
       ctx?.drawImage(image, 0, 0);
 
       const imageData = ctx?.getImageData(0, 0, canvas.width, canvas.height);
-      console.log(imageData);
       if (imageData) {
         const rgbArray = buildRgb(imageData.data);
+        const quantColors = quantization(rgbArray, 0);
       }
     };
     image.src = fileReader.result as string;
