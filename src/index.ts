@@ -7,7 +7,8 @@ import { RGBValue } from "./imageUtil";
  * 
  * @param color 컬러코드
  */
-const callback = (color: string) => {  
+const callback = (colors: [string, string, string]) => {  
+  
 }
 
 const CIRCLE_SIZE = 32;
@@ -34,8 +35,15 @@ $$imgFile.addEventListener("change", () => {
       const width = MAX_WIDTH;
       const height = MAX_HEIGHT;
       
-      extractColors(image.src, {distance: 0}).then((e: any) => {
-        const mainColors = e.map((i: any) => new RGBValue(i.red, i.green, i.blue))
+      extractColors(image.src, {distance: 0.2}).then((e: Array<{
+        hex: string;
+        red: number;
+        green: number;
+        blue: number;
+        area: number;
+        saturation: number;
+      }>) => {
+        const mainColors = e.map((i) => new RGBValue(i.red, i.green, i.blue)).slice(0, 3);
               
         ScopeGroup.create($$draw, image, width, height, mainColors, callback, {
           circle_size: CIRCLE_SIZE,

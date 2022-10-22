@@ -10,7 +10,7 @@ export class ScopeGroup {
     private circles: [Circle, Circle, Circle];
     private areaInfo: DOMRect;
     private imageData: Uint8ClampedArray;
-    private callback: (data: string) => void;
+    private callback: (data: [string, string, string]) => void;
 
     private drawOpt: {
         circle_size: number;
@@ -26,7 +26,7 @@ export class ScopeGroup {
         width: number,
         height: number,
         mainColors: RGBValue[], 
-        callback: (color: string) => void,
+        callback: (color: [string, string, string]) => void,
         opt: {
             circle_size: number;
             circle_line_wid: number;
@@ -59,7 +59,7 @@ export class ScopeGroup {
                 
         const circles = [] as Circle[];
         for (let color of mainColors) {
-            const position = this._findPositionOfColor(color);            
+            const position = this._findPositionOfColor(color);
             if (position) {
                 circles.push(Circle.createByPosition(position, color));
             }
@@ -68,6 +68,7 @@ export class ScopeGroup {
 
         //////////////////////////////////
 
+        this.callback(this.circles.map(e => e.color) as [string, string, string])
         this._draw();
         this._event();
     }
@@ -155,7 +156,7 @@ export class ScopeGroup {
                 const newCircle = new Circle(revPosition.x, revPosition.y, overColor);
                 this.circles[clickIdx] = newCircle;
                 this._draw();
-                this.callback(overColor);
+                this.callback(this.circles.map(e => e.color) as [string, string, string])
             };
 
             const onMouseUp = () => {
@@ -179,18 +180,17 @@ export class ScopeGroup {
 
     private _findPositionOfColor(rgbValue: RGBValue): Position | undefined {
         const { width } = this.ctx.canvas;
-        const startY = width * this.drawOpt.circle_size * 4;
-        const endY = this.imageData.length - startY;        
+        const startY = 0;
+        const endY = this.imageData.length;        
 
         for (let i = startY; i < endY; i += 4) {
-            const rgb = new RGBValue(
-                this.imageData[i],
-                this.imageData[i + 1],
-                this.imageData[i + 2],
-            )
-            if (rgb.compare(rgbValue)) {
-                const x = i % width;
-                const y = Math.floor(i / width);               
+            const r = this.imageData[i];
+            const g = this.imageData[i + 1];
+            const b = this.imageData[i + 2];
+
+            if (r === rgbValue.r && g === rgbValue.g && b === rgbValue.b) {
+                const x = (i / 4) % width;
+                const y = Math.floor((i / 4) / width);               
 
                 return new Position(x, y);
             }
@@ -216,8 +216,9 @@ export class ScopeGroup {
 
     private _colorOfPoint(p: Position) {
         const {width} = this.ctx.canvas;
-        const pointData = this.imageData[p.y * width * 4 + p.x * 4];
+        const x = p.x * 4;
+        const y = p.y * width * 4;        
         
-        return rgbToHex(pointData, pointData+1, pointData+2);
+        return rgbToHex(this.imageData[x + y], this.imageData[x+1 + y], this.imageData[x+2 + y]);
     }
 }

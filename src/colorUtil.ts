@@ -5,10 +5,10 @@ const componentToHex = (c: number) => {
   return hex.length == 1 ? "0" + hex : hex;
 }
 
-export const rgbToHex = (r: number, g: number, b: number, a?: number) => {
+export const rgbToHex = (r: number, g: number, b: number) => {  
   return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
 }
 
 export const rgbValueToHex = (v: RGBValue) => {
-  return rgbToHex(v.r, v.g, v.r);
+  return rgbToHex(v.r, v.g, v.b);
 }
