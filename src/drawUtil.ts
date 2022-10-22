@@ -180,15 +180,20 @@ export class ScopeGroup {
 
     private _findPositionOfColor(rgbValue: RGBValue): Position | undefined {
         const { width } = this.ctx.canvas;
-        const startY = 0;
-        const endY = this.imageData.length;        
 
-        for (let i = startY; i < endY; i += 4) {
+        for (let i = 0; i < this.imageData.length; i += 4) {
             const r = this.imageData[i];
             const g = this.imageData[i + 1];
             const b = this.imageData[i + 2];
 
-            if (r === rgbValue.r && g === rgbValue.g && b === rgbValue.b) {
+            if (
+                r <= rgbValue.r+5 && 
+                r >= rgbValue.r-5 && 
+                g <= rgbValue.g+5 && 
+                g >= rgbValue.g-5 && 
+                b <= rgbValue.b+5 &&
+                b >= rgbValue.b-5
+            ) {
                 const x = (i / 4) % width;
                 const y = Math.floor((i / 4) / width);               
 

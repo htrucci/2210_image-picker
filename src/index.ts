@@ -35,7 +35,11 @@ $$imgFile.addEventListener("change", () => {
       const width = MAX_WIDTH;
       const height = MAX_HEIGHT;
       
-      extractColors(image.src, {distance: 0.2}).then((e: Array<{
+      extractColors(
+        image.src, {
+          distance: 0.2, 
+          saturationImportance: 0
+      }).then((e: Array<{
         hex: string;
         red: number;
         green: number;
