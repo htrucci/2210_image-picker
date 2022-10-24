@@ -8,12 +8,6 @@ declare global {
   }
 }
 
-interface RgbColor {
-  r: number;
-  g: number;
-  b: number;
-}
-
 /**
  * ! 이곳이 callback
  * 
@@ -22,10 +16,10 @@ interface RgbColor {
 const callback = (colors: [string, string, string]) => {  
   // alert(colors[0]+":"+colors[1]+":"+colors[2]);
   // alert(hexToRgb(colors[0])?.r+":"+hexToRgb(colors[1])?.g+":"+hexToRgb(colors[2])?.b);
-  const rgbColors: RgbColor[] = [];
-  rgbColors.push(<RgbColor>hexToRgb(colors[0]));
-  rgbColors.push(<RgbColor>hexToRgb(colors[1]));
-  rgbColors.push(<RgbColor>hexToRgb(colors[2]));
+  const rgbColors: RGBValue[] = [];
+  rgbColors.push(<RGBValue>hexToRgb(colors[0]));
+  rgbColors.push(<RGBValue>hexToRgb(colors[1]));
+  rgbColors.push(<RGBValue>hexToRgb(colors[2]));
   // alert(JSON.stringify(rgbColors));
   outLinkSendRgbColors(JSON.stringify(rgbColors));
 }
