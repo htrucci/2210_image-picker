@@ -64,6 +64,7 @@ export class ScopeGroup {
                 circles.push(Circle.createByPosition(position, color));
             }
         }
+        circles.sort((a, b) => a.y - b.y);
         this.circles = circles as [Circle, Circle, Circle];
 
         //////////////////////////////////
@@ -130,9 +131,11 @@ export class ScopeGroup {
 
     private _event() {
         this.ctx.canvas.addEventListener('mousedown', this._onMouseDown.bind(this));
+        this.ctx.canvas.addEventListener('touchstart', this._onMouseDown.bind(this));
     }
     
-    private _onMouseDown(e: MouseEvent) {
+    private _onMouseDown(e: MouseEvent | TouchEvent) {
+        e.preventDefault();
         const mouseDownPos = this._getRealPosition(e);
         const clickIdx = this._idxOfCircles(mouseDownPos);
         
@@ -141,39 +144,66 @@ export class ScopeGroup {
             const x_gap = clickCircle.x - mouseDownPos.x;
             const y_gap = clickCircle.y - mouseDownPos.y;
 
-            const onMouseMove = (e: MouseEvent) => {
+            const onMouseMove = (e: MouseEvent | TouchEvent) => {
+                e.preventDefault();
+
                 const mouseMovePos = this._getRealPosition(e);                
                 const revPosition = new Position(mouseMovePos.x + x_gap, mouseMovePos.y + y_gap);
-                if (revPosition.x - this.drawOpt.circle_size < 0 || 
-                    revPosition.x + this.drawOpt.circle_size > this.ctx.canvas.width || 
-                    revPosition.y - this.drawOpt.circle_size < 0 || 
-                    revPosition.y + this.drawOpt.circle_size > this.ctx.canvas.height
+                if (revPosition.x < 0 || 
+                    revPosition.x > this.ctx.canvas.width || 
+                    revPosition.y < 0 || 
+                    revPosition.y > this.ctx.canvas.height
                 ) {
                     return;
                 }
                 
                 const overColor = this._colorOfPoint(revPosition);
-                const newCircle = new Circle(revPosition.x, revPosition.y, overColor);
-                this.circles[clickIdx] = newCircle;
-                this._draw();
-                this.callback(this.circles.map(e => e.color) as [string, string, string])
+                if (overColor) {
+                    const newCircle = new Circle(revPosition.x, revPosition.y, overColor);
+                    this.circles[clickIdx] = newCircle;
+                    this._draw();
+                    this.callback(this.circles.map(e => e.color) as [string, string, string])
+                }
             };
 
             const onMouseUp = () => {
                 this.ctx.canvas.removeEventListener('mousemove',onMouseMove);
+                this.ctx.canvas.removeEventListener('touchmove', onMouseMove);
                 this.ctx.canvas.removeEventListener('mouseup', onMouseUp);
                 this.ctx.canvas.removeEventListener('mouseleave', onMouseUp);
+                this.ctx.canvas.removeEventListener('touchend', onMouseUp)
+                this.ctx.canvas.removeEventListener('touchcancel', onMouseUp)
             };
 
             this.ctx.canvas.addEventListener('mousemove', onMouseMove);
+            this.ctx.canvas.addEventListener('touchmove', onMouseMove);
             this.ctx.canvas.addEventListener('mouseup', onMouseUp);
             this.ctx.canvas.addEventListener('mouseleave', onMouseUp)
+            this.ctx.canvas.addEventListener('touchend', onMouseUp)
+            this.ctx.canvas.addEventListener('touchcancel', onMouseUp)
         }
     }
 
-    private _getRealPosition(e: MouseEvent) {
-        const x = e.clientX - this.areaInfo.x;
-        const y = e.clientY - this.areaInfo.y;
+    private _getRealPosition(e: MouseEvent | TouchEvent) {
+        let x = 0;
+        let y = 0;
+
+        if ((e as MouseEvent).clientX) {
+            x = (e as MouseEvent).clientX;
+        } else if ((e as TouchEvent).changedTouches?.length > 0) {
+            x = (e as TouchEvent).changedTouches[0].clientX;
+        }
+
+        if ((e as MouseEvent).clientY) {
+            y = (e as MouseEvent).clientY;
+        } else if ((e as TouchEvent).changedTouches?.length > 0) {
+            y = (e as TouchEvent).changedTouches[0].clientY;
+        }
+
+        x = Math.ceil(x);
+        y = Math.ceil(y);
+        x -= this.areaInfo.x;
+        y -= this.areaInfo.y;
 
         return new Position(x, y);
     }
@@ -222,8 +252,11 @@ export class ScopeGroup {
     private _colorOfPoint(p: Position) {
         const {width} = this.ctx.canvas;
         const x = p.x * 4;
-        const y = p.y * width * 4;        
-        
-        return rgbToHex(this.imageData[x + y], this.imageData[x+1 + y], this.imageData[x+2 + y]);
+        const y = p.y * width * 4;
+        const r = this.imageData[x + y];
+        const g = this.imageData[x + y + 1];
+        const b = this.imageData[x + y + 2];
+
+        return r && g && b ? rgbToHex(r, g, b) : undefined;
     }
 }

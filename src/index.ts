@@ -1,6 +1,6 @@
 import extractColors from 'extract-colors';
 import { ScopeGroup } from "./drawUtil";
-import { RGBValue } from "./imageUtil";
+import { resizeImg, RGBValue } from "./imageUtil";
 
 declare global {
   interface Window {
@@ -74,6 +74,8 @@ const LINE_COLOR = "#ffffff"
 
 const $$imgFile = document.getElementById("imgfile") as HTMLInputElement;
 const $$draw = document.getElementById("draw") as HTMLDivElement;
+const winWidth = window.innerWidth;
+const winHeight = window.innerHeight;
 
 $$imgFile.addEventListener("change", () => {
   const file = $$imgFile.files?.[0];
@@ -83,11 +85,13 @@ $$imgFile.addEventListener("change", () => {
     const image = new Image();
 
     image.onload = () => {
-      const MAX_WIDTH = 500;
-      const MAX_HEIGHT = 500;
-      const width = MAX_WIDTH;
-      const height = MAX_HEIGHT;
+      const imgWid = image.width;
+      const imgHei = image.height;
+      const { width, height } = resizeImg(winWidth, winHeight, imgWid, imgHei);
       
+      image.width = width;
+      image.height = height;
+
       extractColors(
         image.src, {
           distance: 0.2, 
@@ -112,6 +116,10 @@ $$imgFile.addEventListener("change", () => {
       });
     };
     image.src = fileReader.result as string;
+
+    if ($$imgFile.parentElement) {
+      $$imgFile.parentElement.style.display = 'none';
+    }
   };
 
   if (file) {
