@@ -38,6 +38,10 @@ p {
     margin: 0 auto;
     width: 100%;
     max-width: 250px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
 }
 .uploader label {
     float: left;

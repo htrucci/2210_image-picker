@@ -15,6 +15,41 @@ if(urlParams.get("pointerCount") != null){
   // alert(pointerCount);
 }
 
+window['setPointerCount'] = setPointerCount;
+
+function setPointerCount(pointNum: number) {
+  pointerCount = pointNum;
+  alert(pointerCount);
+  const imgWid = image.width;
+  const imgHei = image.height;
+  const { width, height } = resizeImg(winWidth, winHeight, imgWid, imgHei);
+  image.width = width;
+  image.height = height;
+
+  extractColors(
+      image.src, {
+        distance: 0.2,
+        saturationImportance: 0
+      }).then((e: Array<{
+    hex: string;
+    red: number;
+    green: number;
+    blue: number;
+    area: number;
+    saturation: number;
+  }>) => {
+    const mainColors = e.map((i) => new RGBValue(i.red, i.green, i.blue)).slice(0, pointerCount);
+
+    ScopeGroup.create($$draw, image, width, height, mainColors, callback, {
+      circle_size: CIRCLE_SIZE,
+      circle_line_wid: CIRCLE_LINE_WID,
+      circle_line_color: CIRCLE_LINE_COLOR,
+      line_wid: LINE_WID,
+      line_color: LINE_COLOR,
+    });
+  });
+}
+
 /**
  * ! 이곳이 callback
  * 
@@ -71,7 +106,7 @@ function outLinkSendRgbColors(rgbColors: string) {
 
 }
 
-const CIRCLE_SIZE = 32;
+const CIRCLE_SIZE = 28;
 const CIRCLE_LINE_WID = 6;
 const CIRCLE_LINE_COLOR = "#ffffff";
 const LINE_WID = 6;
@@ -83,13 +118,12 @@ const $$imgFile = document.getElementById("imgfile") as HTMLInputElement;
 const $$draw = document.getElementById("draw") as HTMLDivElement;
 const winWidth = window.innerWidth;
 const winHeight = window.innerHeight;
-
+const image = new Image();
 $$imgFile.addEventListener("change", () => {
   const file = $$imgFile.files?.[0];
   const fileReader = new FileReader();
 
   fileReader.onload = () => {
-    const image = new Image();
 
     image.onload = () => {
       const imgWid = image.width;
