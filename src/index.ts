@@ -8,6 +8,13 @@ declare global {
   }
 }
 
+const urlParams = new URLSearchParams(window.location.search);
+var pointerCount = 3;
+if(urlParams.get("pointerCount") != null){
+  pointerCount = urlParams.get("pointerCount");
+  // alert(pointerCount);
+}
+
 /**
  * ! 이곳이 callback
  * 
@@ -104,7 +111,7 @@ $$imgFile.addEventListener("change", () => {
         area: number;
         saturation: number;
       }>) => {
-        const mainColors = e.map((i) => new RGBValue(i.red, i.green, i.blue)).slice(0, 3);
+        const mainColors = e.map((i) => new RGBValue(i.red, i.green, i.blue)).slice(0, pointerCount);
               
         ScopeGroup.create($$draw, image, width, height, mainColors, callback, {
           circle_size: CIRCLE_SIZE,
