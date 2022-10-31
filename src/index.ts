@@ -19,7 +19,7 @@ window['setPointerCount'] = setPointerCount;
 
 function setPointerCount(pointNum: number) {
   pointerCount = pointNum;
-  alert(pointerCount);
+  // alert(pointerCount);
   const imgWid = image.width;
   const imgHei = image.height;
   const { width, height } = resizeImg(winWidth, winHeight, imgWid, imgHei);
@@ -28,8 +28,11 @@ function setPointerCount(pointNum: number) {
 
   extractColors(
       image.src, {
-        distance: 0.2,
-        saturationImportance: 0
+        distance: DISTANCE,
+        saturationImportance: SATURATION_IMPORTANCE,
+        splitPower: SPLITPOWER,
+        // splitPower: 10,
+        // colorValidator : ( red=255,  green = 255,  blue = 255,  alpha  =  255 )  =>  alpha  >  250
       }).then((e: Array<{
     hex: string;
     red: number;
@@ -59,10 +62,9 @@ const callback = (colors: [string, string, string]) => {
   // alert(colors[0]+":"+colors[1]+":"+colors[2]);
   // alert(hexToRgb(colors[0])?.r+":"+hexToRgb(colors[1])?.g+":"+hexToRgb(colors[2])?.b);
   const rgbColors: RGBValue[] = [];
-  rgbColors.push(<RGBValue>hexToRgb(colors[0]));
-  rgbColors.push(<RGBValue>hexToRgb(colors[1]));
-  rgbColors.push(<RGBValue>hexToRgb(colors[2]));
-  // alert(JSON.stringify(rgbColors));
+  for(let i = 0; i < pointerCount; i++){
+    rgbColors.push(<RGBValue>hexToRgb(colors[i]));
+  }
   outLinkSendRgbColors(JSON.stringify(rgbColors));
 }
 
@@ -111,7 +113,9 @@ const CIRCLE_LINE_WID = 6;
 const CIRCLE_LINE_COLOR = "#ffffff";
 const LINE_WID = 6;
 const LINE_COLOR = "#ffffff"
-
+const DISTANCE = 0.2;
+const SATURATION_IMPORTANCE = 1;
+const SPLITPOWER = 5;
 ////////////////////////////////////////////////////////////////////////
 
 const $$imgFile = document.getElementById("imgfile") as HTMLInputElement;
@@ -135,8 +139,10 @@ $$imgFile.addEventListener("change", () => {
 
       extractColors(
         image.src, {
-          distance: 0.2, 
-          saturationImportance: 0
+          distance: DISTANCE,
+          saturationImportance: SATURATION_IMPORTANCE,
+          splitPower: SPLITPOWER,
+            // colorValidator : ( red=255,  green = 255,  blue = 255,  alpha  =  255 )  =>  alpha  >  250
       }).then((e: Array<{
         hex: string;
         red: number;
@@ -145,6 +151,12 @@ $$imgFile.addEventListener("change", () => {
         area: number;
         saturation: number;
       }>) => {
+        console.log("Colors Array:"+e.length);
+        console.log(e[0].hex);
+        console.log(e[1].hex);
+        console.log(e[2].hex);
+        console.log(e[3].hex);
+
         const mainColors = e.map((i) => new RGBValue(i.red, i.green, i.blue)).slice(0, pointerCount);
               
         ScopeGroup.create($$draw, image, width, height, mainColors, callback, {
