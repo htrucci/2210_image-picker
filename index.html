@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./upload.css">
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
   </head>
 
   <body>
@@ -23,7 +24,7 @@
 <!--      <input type="file" id="imgfile">-->
 <!--    </form>-->
     <!-- Upload  -->
-    <form id="file-upload-form" class="uploader">
+    <form id="file-upload-form" class="uploader" action="http://api.vibelife.co.kr/api/v1/files/image/temp">
       <input id="imgfile" type="file" name="fileUpload" accept="image/*" />
       <label for="imgfile" id="file-drag">
         <img id="file-image" src="#" alt="Preview" class="hidden">
@@ -33,12 +34,12 @@
           <div id="notimage" class="hidden">Please select an image</div>
           <span id="file-upload-btn" class="btn btn-primary">Select a file</span>
         </div>
-<!--        <div id="response" class="hidden">-->
-<!--          <div id="messages"></div>-->
-<!--          <progress class="progress" id="file-progress" value="0">-->
-<!--            <span>0</span>%-->
-<!--          </progress>-->
-<!--        </div>-->
+        <div id="response" class="hidden">
+          <div id="messages"></div>
+          <progress class="progress" id="file-progress" value="0">
+            <span>0</span>%
+          </progress>
+        </div>
       </label>
     </form>
     <div id="draw" style="text-align: -webkit-center;"></div>

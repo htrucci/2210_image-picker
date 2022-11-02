@@ -54,9 +54,9 @@ function ekUpload(){
     function parseFile(file) {
 
         console.log(file.name);
-        output(
-            '<strong>' + encodeURI(file.name) + '</strong>'
-        );
+        // output(
+        //     '<strong>' + encodeURI(file.name) + '</strong>'
+        // );
 
         // var fileType = file.type;
         // console.log(fileType);
@@ -68,8 +68,8 @@ function ekUpload(){
             document.getElementById('response').classList.remove("hidden");
             document.getElementById('notimage').classList.add("hidden");
             // Thumbnail Preview
-            document.getElementById('file-image').classList.remove("hidden");
-            document.getElementById('file-image').src = URL.createObjectURL(file);
+            // document.getElementById('file-image').classList.remove("hidden");
+            // document.getElementById('file-image').src = URL.createObjectURL(file);
         }
         else {
             document.getElementById('file-image').classList.add("hidden");
@@ -97,11 +97,17 @@ function ekUpload(){
     }
 
     function uploadFile(file) {
-
+        console.log('uploadFile');
         var xhr = new XMLHttpRequest(),
             fileInput = document.getElementById('class-roster-file'),
             pBar = document.getElementById('file-progress'),
             fileSizeLimit = 1024; // In MB
+        var formdata = new FormData();
+        console.log(document.getElementById('imgfile').files[0]);
+        console.log(file);
+        // formdata.append('image', document.getElementById('imgfile').files[0]);
+        formdata.append('image', file);
+
         if (xhr.upload) {
             // Check if file is less than x MB
             if (file.size <= fileSizeLimit * 1024 * 1024) {
@@ -124,8 +130,20 @@ function ekUpload(){
                 xhr.open('POST', document.getElementById('file-upload-form').action, true);
                 xhr.setRequestHeader('X-File-Name', file.name);
                 xhr.setRequestHeader('X-File-Size', file.size);
-                xhr.setRequestHeader('Content-Type', 'multipart/form-data');
-                xhr.send(file);
+                xhr.responseType = 'json';
+                // xhr.setRequestHeader('Content-Type', 'multipart/form-data; boundary=1');
+                // Object.defineProperty(XMLHttpRequest.prototype,'responseJSON',{value:function(){
+                //     console.log(this.response);
+                //         return JSON.parse(this.response);
+                //     },writable:false,enumerable:false});
+                xhr.onload = function(e) {
+                    if (this.status == 200) {
+                        console.log('response', this.response); // JSON response
+                        console.log('response', this.response.data.url); // JSON response
+                        document.getElementById('file-image').src = this.response.data.url;
+                    }
+                };
+                xhr.send(formdata);
             } else {
                 output('Please upload a smaller file (< ' + fileSizeLimit + ' MB).');
             }

@@ -75,16 +75,22 @@ const CIRCLE_SIZE = 32;
 const CIRCLE_LINE_WID = 6;
 const CIRCLE_LINE_COLOR = "#ffffff";
 const LINE_WID = 6;
-const LINE_COLOR = "#ffffff"
-
+const LINE_COLOR = "#ffffff";
+const DISTANCE = 0.2;
+const SATURATION_IMPORTANCE = 1;
+const SPLITPOWER = 5;
 ////////////////////////////////////////////////////////////////////////
 
 const $$imgFile = document.getElementById("imgfile") as HTMLInputElement;
+const $$previewImg = document.getElementById("file-image") as HTMLImageElement;
 const $$draw = document.getElementById("draw") as HTMLDivElement;
 const winWidth = window.innerWidth;
 const winHeight = window.innerHeight;
 
-$$imgFile.addEventListener("change", () => {
+$$previewImg.addEventListener("load", () => {
+
+  console.log("EVENT!");
+  console.log($$previewImg.width);
   const file = $$imgFile.files?.[0];
   const fileReader = new FileReader();
 
@@ -95,14 +101,15 @@ $$imgFile.addEventListener("change", () => {
       const imgWid = image.width;
       const imgHei = image.height;
       const { width, height } = resizeImg(winWidth, winHeight, imgWid, imgHei);
-      
+
       image.width = width;
       image.height = height;
 
       extractColors(
         image.src, {
-          distance: 0.2, 
-          saturationImportance: 0
+          distance: DISTANCE,
+          saturationImportance: SATURATION_IMPORTANCE,
+          splitPower: SPLITPOWER
       }).then((e: Array<{
         hex: string;
         red: number;
@@ -112,7 +119,9 @@ $$imgFile.addEventListener("change", () => {
         saturation: number;
       }>) => {
         const mainColors = e.map((i) => new RGBValue(i.red, i.green, i.blue)).slice(0, pointerCount);
-              
+        console.log(e[0].hex);
+        console.log(e[1].hex);
+        console.log(e[2].hex);
         ScopeGroup.create($$draw, image, width, height, mainColors, callback, {
           circle_size: CIRCLE_SIZE,
           circle_line_wid: CIRCLE_LINE_WID,
