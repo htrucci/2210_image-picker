@@ -78,7 +78,7 @@ const LINE_WID = 6;
 const LINE_COLOR = "#ffffff";
 const DISTANCE = 0.2;
 const SATURATION_IMPORTANCE = 1;
-const SPLITPOWER = 5;
+const SPLITPOWER = 10;
 ////////////////////////////////////////////////////////////////////////
 
 const $$imgFile = document.getElementById("imgfile") as HTMLInputElement;
@@ -118,11 +118,14 @@ $$previewImg.addEventListener("load", () => {
         area: number;
         saturation: number;
       }>) => {
-        const mainColors = e.map((i) => new RGBValue(i.red, i.green, i.blue)).slice(0, pointerCount);
-        console.log(e[0].hex);
-        console.log(e[1].hex);
-        console.log(e[2].hex);
-        ScopeGroup.create($$draw, image, width, height, mainColors, callback, {
+        const eColors = e.map((i) => new RGBValue(i.red, i.green, i.blue));
+
+        // const eColors = e.map((i) => new RGBValue(i.red, i.green, i.blue)).slice(0, pointerCount);
+        if(e.length < pointerCount){
+          alert("추출가능한 색상이 없습니다. 포인터 갯수를 조정해주세요.");
+        }
+        const slicedEColors = eColors.slice(0, pointerCount);
+        ScopeGroup.create($$draw, image, width, height, slicedEColors, callback, {
           circle_size: CIRCLE_SIZE,
           circle_line_wid: CIRCLE_LINE_WID,
           circle_line_color: CIRCLE_LINE_COLOR,
