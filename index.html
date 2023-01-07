@@ -3,7 +3,7 @@
     <title>Parcel Sandbox</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./upload.css">
+    <link rel="stylesheet" href="/upload.css">
     <script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
   </head>
 
@@ -26,7 +26,7 @@
     <!-- Upload  -->
     <form id="file-upload-form" class="uploader" action="http://api.vibelife.co.kr/api/v1/files/image/temp">
       <input id="imgfile" type="file" name="fileUpload" accept="image/*" />
-      <label for="imgfile" id="file-drag">
+      <label for="imgfile" id="file-drag" style="display: flex;justify-content: center;align-items: center;min-height: 100vh;">
         <img id="file-image" src="#" alt="Preview" class="hidden">
         <div id="start">
           <i class="fa fa-download" aria-hidden="true"></i>
@@ -44,6 +44,6 @@
     </form>
     <div id="draw" style="text-align: -webkit-center;"></div>
     <script src="src/index.ts"></script>
-    <script src="./upload.js"></script>
+    <script src="/upload.js"></script>
   </body>
 </html>

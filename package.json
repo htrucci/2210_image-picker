@@ -2,10 +2,11 @@
   "name": "vanilla-typescript",
   "version": "1.0.0",
   "description": "JavaScript and TypeScript example starter project",
-  "main": "index.html",
+  "main": "colorpicker/index.html",
   "scripts": {
+    "prebuild": "rm -rf dist",
     "start": "parcel index.html --open",
-    "build": "parcel build index.html"
+    "build": "parcel build index.html --public-url http://vibelife.co.kr/colorpicker"
   },
   "dependencies": {
     "extract-colors": "^1.1.22",
